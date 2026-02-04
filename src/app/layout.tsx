@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BHT System - Sri Lanka Hospitals",
-  description: "Hospital Management System",
+  title: "IntelliScan - Intelligent BHT Management for Sri Lankan Hospitals",
+  description: "AI-Powered Healthcare Management System for Sri Lankan Hospitals",
 };
 
 export default function RootLayout({
@@ -28,10 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <NavBar />
-          <main className="app-container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="py-8">{children}</div>
-          </main>
+          {children}
         </AuthProvider>
       </body>
     </html>

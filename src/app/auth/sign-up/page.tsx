@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import NavBar from '@/app/components/NavBar';
 import { useRouter } from "next/navigation";
 
 const UserAddIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -153,51 +154,53 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <NavBar />
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-red-50 via-white to-blue-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-red-500 to-red-600 text-white shadow-lg">
-              <UserAddIcon className="w-8 h-8" />
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 text-white shadow-2xl shadow-red-500/30">
+              <UserAddIcon className="w-10 h-10" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Create Account</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Join the BHT System</p>
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Create Account</h2>
+          <p className="mt-3 text-gray-600 dark:text-gray-400">Join <span className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">IntelliScan</span></p>
         </div>
 
         {/* Form Card */}
-        <div className="card mt-8 p-8">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Alert */}
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <AlertIcon className="w-5 h-5 text-red-600 shrink-0" />
-                <p className="text-sm text-red-800">{error}</p>
+              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                <AlertIcon className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+                <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
               </div>
             )}
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Select Your Role *
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setSelectedRole('Doctor')}
-                  className={`flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                  className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all ${
                     selectedRole === 'Doctor'
-                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20 shadow-md'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm'
+                      ? 'border-red-500 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 shadow-lg shadow-red-500/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    selectedRole === 'Doctor' ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                    selectedRole === 'Doctor' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                   }`}>
                     <DoctorIcon className="w-6 h-6" />
                   </div>
-                  <span className={`font-medium ${
+                  <span className={`font-semibold ${
                     selectedRole === 'Doctor' ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'
                   }`}>
                     Doctor
@@ -207,18 +210,18 @@ export default function SignUp() {
                 <button
                   type="button"
                   onClick={() => setSelectedRole('Consultant')}
-                  className={`flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                  className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all ${
                     selectedRole === 'Consultant'
-                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20 shadow-md'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm'
+                      ? 'border-red-500 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 shadow-lg shadow-red-500/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    selectedRole === 'Consultant' ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                    selectedRole === 'Consultant' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                   }`}>
                     <ConsultantIcon className="w-6 h-6" />
                   </div>
-                  <span className={`font-medium ${
+                  <span className={`font-semibold ${
                     selectedRole === 'Consultant' ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'
                   }`}>
                     Consultant
@@ -230,11 +233,11 @@ export default function SignUp() {
             {/* Ward Selection - Only for Doctors */}
             {selectedRole === 'Doctor' && (
               <div>
-                <label htmlFor="ward" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="ward" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Select Ward *
                 </label>
                 {loadingWards ? (
-                  <div className="flex items-center justify-center py-3 text-gray-500">
+                  <div className="flex items-center justify-center py-3 text-gray-500 dark:text-gray-400">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600 mr-2"></div>
                     Loading wards...
                   </div>
@@ -249,7 +252,7 @@ export default function SignUp() {
                     required
                     value={selectedWard}
                     onChange={(e) => setSelectedWard(e.target.value)}
-                    className="appearance-none block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    className="appearance-none block w-full px-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                   >
                     <option value="">-- Select a Ward --</option>
                     {wards.map((ward) => (
@@ -264,11 +267,11 @@ export default function SignUp() {
 
             {/* Name Field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Full Name *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <UserAddIcon className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
@@ -278,19 +281,19 @@ export default function SignUp() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                  placeholder="Dr. John Smith"
+                  className="appearance-none block w-full pl-12 pr-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="Dr. Nimal Perera"
                 />
               </div>
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Email Address *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <MailIcon className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
@@ -301,19 +304,19 @@ export default function SignUp() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                  placeholder="john.smith@hospital.lk"
+                  className="appearance-none block w-full pl-12 pr-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="nimal.perera@hospital.lk"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Password *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <LockIcon className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
@@ -324,20 +327,20 @@ export default function SignUp() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                  className="appearance-none block w-full pl-12 pr-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be at least 8 characters</p>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Must be at least 8 characters</p>
             </div>
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Confirm Password *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <LockIcon className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
@@ -348,7 +351,7 @@ export default function SignUp() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                  className="appearance-none block w-full pl-12 pr-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                 />
               </div>
@@ -359,7 +362,7 @@ export default function SignUp() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full btn-primary py-3 text-base font-semibold hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3.5 px-4 rounded-xl text-base font-semibold shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -380,7 +383,7 @@ export default function SignUp() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{" "}
-              <a href="/auth/login" className="font-medium text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300 transition-colors">
+              <a href="/auth/login" className="font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
                 Sign in here
               </a>
             </p>
@@ -389,9 +392,10 @@ export default function SignUp() {
 
         {/* Footer Info */}
         <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-          By signing up, you agree to our Terms of Service and Privacy Policy
+          Empowering Sri Lankan Healthcare with AI • IntelliScan © 2026
         </p>
       </div>
     </div>
+    </>
   );
 }

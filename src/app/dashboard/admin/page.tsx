@@ -16,8 +16,12 @@ function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 via-white to-purple-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-purple-600 border-r-transparent border-b-transparent border-l-transparent absolute inset-0"></div>
+        </div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading admin dashboard...</p>
       </div>
     );
   }

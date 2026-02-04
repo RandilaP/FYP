@@ -47,8 +47,12 @@ export default function MyBHTRecordsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-red-600 border-r-transparent border-b-transparent border-l-transparent absolute inset-0"></div>
+        </div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading BHT records...</p>
       </div>
     );
   }
@@ -57,9 +61,9 @@ export default function MyBHTRecordsPage() {
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My BHT Records</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">My BHT Records</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             View and manage all your submitted BHT records
           </p>
         </div>
@@ -68,30 +72,30 @@ export default function MyBHTRecordsPage() {
         <div className="mb-6 flex gap-3">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-5 py-2.5 rounded-xl transition-all font-semibold ${
               filter === 'all'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105'
             }`}
           >
             All ({bhts.length})
           </button>
           <button
             onClick={() => setFilter('draft')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-5 py-2.5 rounded-xl transition-all font-semibold ${
               filter === 'draft'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105'
             }`}
           >
             Draft ({bhts.filter(b => b.status === 'draft').length})
           </button>
           <button
             onClick={() => setFilter('finalized')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-5 py-2.5 rounded-xl transition-all font-semibold ${
               filter === 'finalized'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105'
             }`}
           >
             Finalized ({bhts.filter(b => b.status === 'finalized').length})

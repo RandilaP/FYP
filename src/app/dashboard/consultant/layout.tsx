@@ -74,12 +74,12 @@ export default function ConsultantLayout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed h-full">
+      <aside className="w-64 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-r border-gray-200 dark:border-gray-700 fixed h-full shadow-xl">
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center text-white">
+          <div className="flex items-center gap-3 mb-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-4 shadow-lg shadow-blue-500/30">
+            <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5"/>
@@ -87,8 +87,8 @@ export default function ConsultantLayout({ children }: LayoutProps) {
               </svg>
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-gray-100">Consultant</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Dashboard</p>
+              <h2 className="font-bold text-white">Consultant</h2>
+              <p className="text-xs text-white/80">Dashboard</p>
             </div>
           </div>
 
@@ -101,10 +101,10 @@ export default function ConsultantLayout({ children }: LayoutProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     active
-                      ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -117,7 +117,7 @@ export default function ConsultantLayout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 bg-gray-50 dark:bg-gray-950">
+      <main className="flex-1 ml-64 p-8">
         {children}
       </main>
     </div>

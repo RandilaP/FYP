@@ -185,8 +185,12 @@ export default function WardManagementPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-blue-600 border-r-transparent border-b-transparent border-l-transparent absolute inset-0"></div>
+        </div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading wards...</p>
       </div>
     );
   }
