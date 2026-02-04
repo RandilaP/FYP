@@ -60,8 +60,8 @@ export default function ConsultantLayout({ children }: LayoutProps) {
       icon: HospitalIcon 
     },
     { 
-      href: '/dashboard/consultant/bht-records', 
-      label: 'BHT Records', 
+      href: '/dashboard/consultant/review-patients', 
+      label: 'Review Patients', 
       icon: FileTextIcon 
     },
   ];
