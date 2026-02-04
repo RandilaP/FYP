@@ -57,11 +57,31 @@ export default function Login() {
       // Login returns user data with role
       const userData = await login(email, password);
       
+      // Check account status for doctors
+      if (userData.role === 'Doctor' && userData.account_status) {
+        if (userData.account_status === 'pending') {
+          router.push('/dashboard/doctor?status=pending');
+          return;
+        } else if (userData.account_status === 'rejected') {
+          router.push('/dashboard/doctor?status=rejected');
+          return;
+        }
+      }
+      
       // Immediately redirect based on role
       const dashboardRoute = getDashboardRoute(userData.role);
       router.push(dashboardRoute);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred during login");
+      const errorMessage = err instanceof Error ? err.message : "An error occurred during login";
+      
+      // Handle specific 403 errors for pending/rejected status
+      if (errorMessage.includes('pending')) {
+        setError('Your account is awaiting approval by a consultant. You will be notified once approved.');
+      } else if (errorMessage.includes('rejected')) {
+        setError('Your registration was rejected. Please contact the hospital administration for more information.');
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

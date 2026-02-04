@@ -8,6 +8,8 @@ export interface User {
   name: string;
   email: string;
   role: 'Admin' | 'Doctor' | 'Consultant';
+  account_status?: 'pending' | 'approved' | 'rejected';
+  ward_id?: string;
   created_at?: string;
   updated_at?: string;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const UserAddIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -48,6 +48,13 @@ const ConsultantIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
 
 type UserRole = 'Doctor' | 'Consultant';
 
+interface Ward {
+  ward_id: string;
+  name: string;
+  location: string;
+  consultant_id: string;
+}
+
 export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -55,8 +62,30 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedWard, setSelectedWard] = useState("");
+  const [wards, setWards] = useState<Ward[]>([]);
+  const [loadingWards, setLoadingWards] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch wards on component mount
+  useEffect(() => {
+    const fetchWards = async () => {
+      setLoadingWards(true);
+      try {
+        const response = await fetch('http://localhost:8000/api/wards/');
+        if (response.ok) {
+          const data = await response.json();
+          setWards(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch wards:', err);
+      } finally {
+        setLoadingWards(false);
+      }
+    };
+    fetchWards();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +94,11 @@ export default function SignUp() {
     // Validation
     if (!selectedRole) {
       setError("Please select a role (Doctor or Consultant)");
+      return;
+    }
+
+    if (selectedRole === 'Doctor' && !selectedWard) {
+      setError("Doctors must select a ward");
       return;
     }
 
@@ -81,12 +115,17 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      const payload = {
+      const payload: any = {
         name,
         email,
         password,
         role: selectedRole,
       };
+      
+      // Add ward_id for doctors
+      if (selectedRole === 'Doctor') {
+        payload.ward_id = selectedWard;
+      }
       
       console.log('Sending signup request with payload:', payload);
       
@@ -187,6 +226,41 @@ export default function SignUp() {
                 </button>
               </div>
             </div>
+
+            {/* Ward Selection - Only for Doctors */}
+            {selectedRole === 'Doctor' && (
+              <div>
+                <label htmlFor="ward" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Select Ward *
+                </label>
+                {loadingWards ? (
+                  <div className="flex items-center justify-center py-3 text-gray-500">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600 mr-2"></div>
+                    Loading wards...
+                  </div>
+                ) : wards.length === 0 ? (
+                  <div className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                    No wards available. Please contact administration.
+                  </div>
+                ) : (
+                  <select
+                    id="ward"
+                    name="ward"
+                    required
+                    value={selectedWard}
+                    onChange={(e) => setSelectedWard(e.target.value)}
+                    className="appearance-none block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">-- Select a Ward --</option>
+                    {wards.map((ward) => (
+                      <option key={ward.ward_id} value={ward.ward_id}>
+                        {ward.name} - {ward.location}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
 
             {/* Name Field */}
             <div>
