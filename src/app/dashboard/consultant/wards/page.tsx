@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import PatientDetailsSidePanel from '../review-patients/PatientDetailsSidePanel';
 
 interface Ward {
   ward_id: string;
@@ -20,6 +21,56 @@ interface Patient {
   current_ward_id: string;
 }
 
+interface PatientDetails {
+  patient: {
+    patient_id: string;
+    name: string;
+    age: number;
+    gender: string;
+    admission_date: string;
+    medical_history: string;
+    allergies: string;
+    emergency_contact: string;
+    created_at: string;
+  };
+  ward: {
+    ward_id: string;
+    name: string;
+    location: string;
+    capacity: number;
+  };
+  doctor: {
+    user_id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  bht_records: Array<{
+    bht_id: string;
+    diagnosis: string;
+    symptoms: string;
+    treatment_plan: string;
+    medications: string;
+    status: string;
+    vitals?: any;
+    upload_date: string;
+  }>;
+  summary: {
+    report_id: string;
+    summary_text: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+  };
+  statistics: {
+    total_bhts: number;
+    draft_bhts: number;
+    finalized_bhts: number;
+    approved_bhts: number;
+    rejected_bhts: number;
+  };
+}
+
 interface BHTRecord {
   bht_id: string;
   patient_id: string;
@@ -35,11 +86,10 @@ export default function WardManagementPage() {
   const [wards, setWards] = useState<Ward[]>([]);
   const [selectedWard, setSelectedWard] = useState<Ward | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [bhtRecords, setBhtRecords] = useState<BHTRecord[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<PatientDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'patients' | 'bhts'>('patients');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newWardName, setNewWardName] = useState('');
   const [newWardLocation, setNewWardLocation] = useState('');
@@ -117,9 +167,38 @@ export default function WardManagementPage() {
       }
 
       const data = await response.json();
-      setBhtRecords(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load BHT records');
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const fetchPatientDetails = async (patientId: string) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    setLoadingDetails(true);
+    setError('');
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/consultants/patients/${patientId}/details`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          throw new Error('This patient is not in your ward');
+        }
+        throw new Error('Failed to fetch patient details');
+      }
+
+      const data = await response.json();
+      setSelectedPatient(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load patient details');
     } finally {
       setLoadingDetails(false);
     }
@@ -133,15 +212,13 @@ export default function WardManagementPage() {
 
   const handleWardSelect = (ward: Ward) => {
     setSelectedWard(ward);
-    setActiveTab('patients');
+    setSelectedPatient(null);
     fetchWardPatients(ward.ward_id);
   };
 
-  useEffect(() => {
-    if (selectedWard && activeTab === 'bhts') {
-      fetchWardBHTs(selectedWard.ward_id);
-    }
-  }, [activeTab, selectedWard]);
+  const handlePatientSelect = (patient: Patient) => {
+    fetchPatientDetails(patient.patient_id);
+  };
 
   const handleCreateWard = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,43 +330,11 @@ export default function WardManagementPage() {
 
         {/* Ward Details */}
         <div className="lg:col-span-2">
-          {!selectedWard ? (
-            <div className="card p-12 text-center">
-              <svg className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-              </svg>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Select a Ward</h3>
-              <p className="text-gray-600 dark:text-gray-400">Choose a ward from the list to view details</p>
-            </div>
-          ) : (
+          {selectedWard && (
             <div className="card">
               <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{selectedWard.ward_name}</h2>
                 <p className="text-gray-600 dark:text-gray-400">{selectedWard.location}</p>
-              </div>
-
-              {/* Tabs */}
-              <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setActiveTab('patients')}
-                  className={`pb-2 px-1 font-medium transition-colors ${
-                    activeTab === 'patients'
-                      ? 'text-red-600 border-b-2 border-red-600'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                  }`}
-                >
-                  Patients ({patients.length})
-                </button>
-                <button
-                  onClick={() => setActiveTab('bhts')}
-                  className={`pb-2 px-1 font-medium transition-colors ${
-                    activeTab === 'bhts'
-                      ? 'text-red-600 border-b-2 border-red-600'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                  }`}
-                >
-                  BHT Records ({bhtRecords.length})
-                </button>
               </div>
 
               {loadingDetails ? (
@@ -297,67 +342,55 @@ export default function WardManagementPage() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                 </div>
               ) : (
-                <>
-                  {activeTab === 'patients' && (
-                    <div className="space-y-3">
-                      {patients.length === 0 ? (
-                        <p className="text-gray-600 dark:text-gray-400 text-center py-8">No patients in this ward</p>
-                      ) : (
-                        patients.map((patient) => (
-                          <div key={patient.patient_id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-gray-100">{patient.name}</div>
-                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                  {patient.age} years • {patient.gender}
-                                </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                                  {patient.contact_number}
-                                </div>
-                              </div>
+                <div className="space-y-3">
+                  {patients.length === 0 ? (
+                    <p className="text-gray-600 dark:text-gray-400 text-center py-8">No patients in this ward</p>
+                  ) : (
+                    patients.map((patient) => (
+                      <button
+                        key={patient.patient_id}
+                        onClick={() => handlePatientSelect(patient)}
+                        className="w-full text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-700 hover:border-red-400 dark:hover:border-red-500"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-gray-100">{patient.name}</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              {patient.age} years • {patient.gender}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                              {patient.contact_number}
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
+                          <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </button>
+                    ))
                   )}
-
-                  {activeTab === 'bhts' && (
-                    <div className="space-y-3">
-                      {bhtRecords.length === 0 ? (
-                        <p className="text-gray-600 dark:text-gray-400 text-center py-8">No BHT records in this ward</p>
-                      ) : (
-                        bhtRecords.map((bht) => (
-                          <div key={bht.bht_id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-gray-100">BHT #{bht.bht_id?.slice(0, 8) || 'N/A'}</div>
-                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                  Patient: {bht.patient_name}
-                                </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                                  Created: {new Date(bht.created_at).toLocaleDateString()}
-                                </div>
-                              </div>
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                bht.status === 'Pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400' :
-                                bht.status === 'Approved' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
-                                'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
-                              }`}>
-                                {bht.status}
-                              </span>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </>
+                </div>
               )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Patient Details Side Panel */}
+      <PatientDetailsSidePanel
+        patient={selectedPatient}
+        isOpen={!!selectedPatient}
+        isLoading={false}
+        reviewNotes=""
+        onReviewNotesChange={() => {}}
+        onApprove={() => {}}
+        onReject={() => {}}
+        onClose={() => {
+          setSelectedPatient(null);
+          setError('');
+        }}
+        detailsLoading={loadingDetails}
+      />
 
       {/* Create Ward Modal */}
       {showCreateModal && (
