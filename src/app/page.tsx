@@ -83,7 +83,7 @@ export default function Home() {
                 </svg>
               </div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Smart Summaries</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">AI-generated patient summaries</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Automated patient summaries</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
