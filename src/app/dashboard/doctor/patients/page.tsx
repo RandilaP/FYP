@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getMyPatients, createPatient } from '@/lib/api/doctor';
+import { getWardPatients, getWardBHTRecords, createPatient } from '@/lib/api/doctor';
 
 interface Patient {
   patient_id: string;
@@ -16,10 +16,20 @@ interface Patient {
   discharge_date: string | null;
 }
 
+interface BHTRecord {
+  bht_id: string;
+  patient_id: string;
+  doctor_id: string;
+  upload_date: string;
+  status: 'draft' | 'finalized' | 'rejected';
+  diagnosis: string;
+}
+
 export default function PatientsPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [bhts, setBhts] = useState<BHTRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,14 +43,22 @@ export default function PatientsPage() {
   });
 
   useEffect(() => {
-    fetchPatients();
-  }, []);
+    if (user?.ward_id) {
+      fetchPatients();
+    }
+  }, [user]);
 
   const fetchPatients = async () => {
+    if (!user?.ward_id) return;
+
     try {
       setLoading(true);
-      const data = await getMyPatients();
-      setPatients(data);
+      const [patientsData, bhtsData] = await Promise.all([
+        getWardPatients(user.ward_id),
+        getWardBHTRecords(user.ward_id),
+      ]);
+      setPatients(patientsData);
+      setBhts(bhtsData);
       setError('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch patients');
@@ -80,6 +98,8 @@ export default function PatientsPage() {
     }
   };
 
+  const activePatients = patients.filter(p => !p.discharge_date).length;
+
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -116,7 +136,7 @@ export default function PatientsPage() {
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">My Patients</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Manage and view all your assigned patients
+                Manage and view all ward patients
               </p>
             </div>
             <button
@@ -128,6 +148,51 @@ export default function PatientsPage() {
               </svg>
               Add Patient
             </button>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl shadow-blue-500/10 border border-gray-200 dark:border-gray-700 p-6 hover:shadow-2xl hover:shadow-blue-500/20 hover:scale-105 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Patients</p>
+                <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mt-2">{patients.length}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl shadow-green-500/10 border border-gray-200 dark:border-gray-700 p-6 hover:shadow-2xl hover:shadow-green-500/20 hover:scale-105 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Patients</p>
+                <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mt-2">{activePatients}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl shadow-purple-500/10 border border-gray-200 dark:border-gray-700 p-6 hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total BHT Records</p>
+                <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mt-2">{bhts.length}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
 
