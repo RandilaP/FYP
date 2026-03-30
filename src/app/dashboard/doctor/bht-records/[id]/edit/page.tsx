@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { updateBHTRecord } from '@/lib/api/doctor';
 
 interface BHTRecord {
@@ -23,7 +22,7 @@ interface BHTRecord {
     oxygen_saturation?: string;
   };
   procedures: string | null;
-  lab_results: any;
+  lab_results: Record<string, string | number | null | undefined>;
   notes: string;
   ocr_text: string;
 }
@@ -48,13 +47,7 @@ export default function BHTEditPage() {
     notes: '',
   });
 
-  useEffect(() => {
-    if (recordId) {
-      fetchBHTRecord();
-    }
-  }, [recordId]);
-
-  const fetchBHTRecord = async () => {
+  const fetchBHTRecord = useCallback(async () => {
     if (!recordId) return;
     
     try {
@@ -78,7 +71,13 @@ export default function BHTEditPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [recordId]);
+
+  useEffect(() => {
+    if (recordId) {
+      fetchBHTRecord();
+    }
+  }, [recordId, fetchBHTRecord]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,16 +118,6 @@ export default function BHTEditPage() {
       ...formData,
       vitals: {
         ...formData.vitals,
-        [key]: value,
-      },
-    });
-  };
-
-  const updateLabResults = (key: string, value: string) => {
-    setFormData({
-      ...formData,
-      lab_results: {
-        ...(formData.lab_results || {}),
         [key]: value,
       },
     });

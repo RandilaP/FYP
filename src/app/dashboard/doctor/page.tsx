@@ -6,6 +6,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getMyPatients, getMyBHTRecords } from '@/lib/api/doctor';
 
+interface DoctorBHTStatus {
+  status: 'draft' | 'finalized' | 'rejected' | string;
+}
+
 function DoctorDashboardContent() {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
@@ -36,8 +40,8 @@ function DoctorDashboardContent() {
         
         setStats({
           totalPatients: patients.length,
-          draftBHTs: bhts.filter((b: any) => b.status === 'draft').length,
-          finalizedBHTs: bhts.filter((b: any) => b.status === 'finalized').length,
+          draftBHTs: (bhts as DoctorBHTStatus[]).filter((b) => b.status === 'draft').length,
+          finalizedBHTs: (bhts as DoctorBHTStatus[]).filter((b) => b.status === 'finalized').length,
         });
       } catch (error) {
         console.error('Failed to fetch stats:', error);
@@ -82,7 +86,7 @@ function DoctorDashboardContent() {
           </p>
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
             <p className="text-sm text-blue-800 dark:text-blue-400">
-              <strong>What's next?</strong><br />
+              <strong>What&apos;s next?</strong><br />
               A consultant will review your registration and ward assignment. This usually takes 1-2 business days.
             </p>
           </div>

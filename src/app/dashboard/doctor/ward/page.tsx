@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { getWardPatients, getWardBHTRecords } from '@/lib/api/doctor';
@@ -32,13 +32,7 @@ export default function WardPage() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'patients' | 'bhts'>('patients');
 
-  useEffect(() => {
-    if (user?.ward_id) {
-      fetchWardData();
-    }
-  }, [user]);
-
-  const fetchWardData = async () => {
+  const fetchWardData = useCallback(async () => {
     if (!user?.ward_id) return;
 
     try {
@@ -55,7 +49,13 @@ export default function WardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.ward_id]);
+
+  useEffect(() => {
+    if (user?.ward_id) {
+      fetchWardData();
+    }
+  }, [user?.ward_id, fetchWardData]);
 
   const calculateAge = (dob: string) => {
     const birthDate = new Date(dob);

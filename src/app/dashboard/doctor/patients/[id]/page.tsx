@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -34,9 +34,9 @@ interface BHTRecord {
   symptoms: string;
   treatment_plan: string;
   medications: string;
-  vitals: any;
+  vitals: Record<string, string | number | null | undefined>;
   procedures: string | null;
-  lab_results: any;
+  lab_results: Record<string, string | number | null | undefined>;
   notes: string;
 }
 
@@ -72,11 +72,7 @@ export default function PatientDetailPage() {
   const [savingSummary, setSavingSummary] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchPatientData();
-  }, [patientId]);
-
-  const fetchPatientData = async () => {
+  const fetchPatientData = useCallback(async () => {
     try {
       setLoading(true);
       const [patientData, bhtsData, summaryData] = await Promise.all([
@@ -97,7 +93,11 @@ export default function PatientDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [patientId]);
+
+  useEffect(() => {
+    fetchPatientData();
+  }, [fetchPatientData]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

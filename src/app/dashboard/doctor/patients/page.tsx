@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getWardPatients, getWardBHTRecords, createPatient } from '@/lib/api/doctor';
 
@@ -27,7 +26,6 @@ interface BHTRecord {
 
 export default function PatientsPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [bhts, setBhts] = useState<BHTRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,13 +40,7 @@ export default function PatientsPage() {
     admission_date: new Date().toISOString().slice(0, 16),
   });
 
-  useEffect(() => {
-    if (user?.ward_id) {
-      fetchPatients();
-    }
-  }, [user]);
-
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     if (!user?.ward_id) return;
 
     try {
@@ -65,7 +57,13 @@ export default function PatientsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.ward_id]);
+
+  useEffect(() => {
+    if (user?.ward_id) {
+      fetchPatients();
+    }
+  }, [user?.ward_id, fetchPatients]);
 
   const handleCreatePatient = async (e: React.FormEvent) => {
     e.preventDefault();

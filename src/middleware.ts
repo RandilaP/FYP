@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server';
 // we rely on client-side guards in each protected page.
 // Middleware can't access localStorage, so we keep this minimal.
 export function middleware(request: NextRequest) {
+  void request;
   return NextResponse.next();
 }
 

@@ -1,9 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import PatientDetailsSidePanel from '../review-patients/PatientDetailsSidePanel';
+
+type Vitals = Record<string, string | number | null | undefined>;
+
+const getErrorMessage = (err: unknown, fallback: string) =>
+  err instanceof Error ? err.message : fallback;
 
 interface Ward {
   ward_id: string;
@@ -52,7 +57,7 @@ interface PatientDetails {
     treatment_plan: string;
     medications: string;
     status: string;
-    vitals?: any;
+    vitals?: Vitals;
     upload_date: string;
   }>;
   summary: {
@@ -69,15 +74,6 @@ interface PatientDetails {
     approved_bhts: number;
     rejected_bhts: number;
   };
-}
-
-interface BHTRecord {
-  bht_id: string;
-  patient_id: string;
-  patient_name: string;
-  ward_id: string;
-  status: string;
-  created_at: string;
 }
 
 export default function WardManagementPage() {
@@ -101,7 +97,7 @@ export default function WardManagementPage() {
     }
   }, [user, isLoading, router]);
 
-  const fetchWards = async () => {
+  const fetchWards = useCallback(async () => {
     const token = localStorage.getItem('access_token');
     if (!token || !user) return;
 
@@ -123,7 +119,7 @@ export default function WardManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   const fetchWardPatients = async (wardId: string) => {
     const token = localStorage.getItem('access_token');
@@ -145,30 +141,6 @@ export default function WardManagementPage() {
       setPatients(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load patients');
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
-
-  const fetchWardBHTs = async (wardId: string) => {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-
-    setLoadingDetails(true);
-    try {
-      const response = await fetch(`http://localhost:8000/api/wards/${wardId}/bht_records`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch BHT records');
-      }
-
-      const data = await response.json();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load BHT records');
     } finally {
       setLoadingDetails(false);
     }
@@ -197,8 +169,8 @@ export default function WardManagementPage() {
 
       const data = await response.json();
       setSelectedPatient(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load patient details');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to load patient details'));
     } finally {
       setLoadingDetails(false);
     }
@@ -208,7 +180,7 @@ export default function WardManagementPage() {
     if (user) {
       fetchWards();
     }
-  }, [user]);
+  }, [user, fetchWards]);
 
   const handleWardSelect = (ward: Ward) => {
     setSelectedWard(ward);

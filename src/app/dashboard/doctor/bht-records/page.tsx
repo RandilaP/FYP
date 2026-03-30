@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getMyBHTRecords } from '@/lib/api/doctor';
 
@@ -18,17 +17,12 @@ interface BHTRecord {
 }
 
 export default function MyBHTRecordsPage() {
-  const router = useRouter();
   const [bhts, setBhts] = useState<BHTRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<'all' | 'draft' | 'finalized'>('all');
 
-  useEffect(() => {
-    fetchBHTs();
-  }, [filter]);
-
-  const fetchBHTs = async () => {
+  const fetchBHTs = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getMyBHTRecords(filter === 'all' ? undefined : filter);
@@ -39,7 +33,11 @@ export default function MyBHTRecordsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    fetchBHTs();
+  }, [fetchBHTs]);
 
   const filteredBHTs = filter === 'all' 
     ? bhts 

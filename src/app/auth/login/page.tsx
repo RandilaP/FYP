@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import NavBar from '@/app/components/NavBar';
+import Link from 'next/link';
 
 const LockIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +29,7 @@ const AlertIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
 
 export default function Login() {
   const router = useRouter();
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -177,9 +178,9 @@ export default function Login() {
                 </label>
               </div>
               <div className="text-sm">
-                <a href="/auth/forgot-password" className="font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
+                <Link href="/auth/forgot-password" className="font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -208,10 +209,10 @@ export default function Login() {
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
-              <a href="/auth/sign-up" className="font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
+              Don&apos;t have an account?{" "}
+              <Link href="/auth/sign-up" className="font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
                 Sign up here
-              </a>
+              </Link>
             </p>
           </div>
         </div>
