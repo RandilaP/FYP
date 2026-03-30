@@ -22,7 +22,7 @@ interface BHTRecord {
     oxygen_saturation?: string;
   };
   procedures: string | null;
-  lab_results: Record<string, string | number | null | undefined>;
+  lab_results: Record<string, string | number | null | undefined> | string;
   notes: string;
   ocr_text: string;
 }
@@ -86,6 +86,17 @@ export default function BHTEditPage() {
     setSuccess('');
 
     try {
+      const normalizedLabResults =
+        typeof formData.lab_results === 'string'
+          ? (() => {
+              try {
+                return JSON.parse(formData.lab_results) as Record<string, string | number | null | undefined>;
+              } catch {
+                return { raw_text: formData.lab_results };
+              }
+            })()
+          : formData.lab_results;
+
       await updateBHTRecord(recordId, {
         diagnosis: formData.diagnosis,
         symptoms: formData.symptoms,
@@ -93,7 +104,7 @@ export default function BHTEditPage() {
         medications: formData.medications,
         vitals: formData.vitals,
         procedures: formData.procedures,
-        lab_results: formData.lab_results,
+        lab_results: normalizedLabResults,
         notes: formData.notes,
         validated_text: JSON.stringify({
           diagnosis: formData.diagnosis,
