@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getMyPatients, getMyBHTRecords } from '@/lib/api/doctor';
 
-function DoctorDashboard() {
+function DoctorDashboardContent() {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -357,4 +357,20 @@ function DoctorDashboard() {
   );
 }
 
-export default DoctorDashboard;
+export default function DoctorDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 via-white to-red-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-red-600 border-r-transparent border-b-transparent border-l-transparent absolute inset-0"></div>
+          </div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading dashboard...</p>
+        </div>
+      }
+    >
+      <DoctorDashboardContent />
+    </Suspense>
+  );
+}
