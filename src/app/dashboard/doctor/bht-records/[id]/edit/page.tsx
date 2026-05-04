@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { updateBHTRecord } from '@/lib/api/doctor';
 
 interface BHTRecord {
@@ -23,7 +22,7 @@ interface BHTRecord {
     oxygen_saturation?: string;
   };
   procedures: string | null;
-  lab_results: any;
+  lab_results: Record<string, string | number | null | undefined> | string;
   notes: string;
   ocr_text: string;
 }
@@ -48,13 +47,7 @@ export default function BHTEditPage() {
     notes: '',
   });
 
-  useEffect(() => {
-    if (recordId) {
-      fetchBHTRecord();
-    }
-  }, [recordId]);
-
-  const fetchBHTRecord = async () => {
+  const fetchBHTRecord = useCallback(async () => {
     if (!recordId) return;
     
     try {
@@ -78,7 +71,13 @@ export default function BHTEditPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [recordId]);
+
+  useEffect(() => {
+    if (recordId) {
+      fetchBHTRecord();
+    }
+  }, [recordId, fetchBHTRecord]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +86,17 @@ export default function BHTEditPage() {
     setSuccess('');
 
     try {
+      const normalizedLabResults =
+        typeof formData.lab_results === 'string'
+          ? (() => {
+              try {
+                return JSON.parse(formData.lab_results) as Record<string, string | number | null | undefined>;
+              } catch {
+                return { raw_text: formData.lab_results };
+              }
+            })()
+          : formData.lab_results;
+
       await updateBHTRecord(recordId, {
         diagnosis: formData.diagnosis,
         symptoms: formData.symptoms,
@@ -94,7 +104,7 @@ export default function BHTEditPage() {
         medications: formData.medications,
         vitals: formData.vitals,
         procedures: formData.procedures,
-        lab_results: formData.lab_results,
+        lab_results: normalizedLabResults,
         notes: formData.notes,
         validated_text: JSON.stringify({
           diagnosis: formData.diagnosis,
@@ -119,16 +129,6 @@ export default function BHTEditPage() {
       ...formData,
       vitals: {
         ...formData.vitals,
-        [key]: value,
-      },
-    });
-  };
-
-  const updateLabResults = (key: string, value: string) => {
-    setFormData({
-      ...formData,
-      lab_results: {
-        ...(formData.lab_results || {}),
         [key]: value,
       },
     });

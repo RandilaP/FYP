@@ -1,12 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+export const dynamic = 'force-dynamic';
+
+import React, { Suspense, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getMyPatients, getMyBHTRecords } from '@/lib/api/doctor';
 
-function DoctorDashboard() {
+interface DoctorBHTStatus {
+  status: 'draft' | 'finalized' | 'rejected' | string;
+}
+
+function DoctorDashboardContent() {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,8 +42,8 @@ function DoctorDashboard() {
         
         setStats({
           totalPatients: patients.length,
-          draftBHTs: bhts.filter((b: any) => b.status === 'draft').length,
-          finalizedBHTs: bhts.filter((b: any) => b.status === 'finalized').length,
+          draftBHTs: (bhts as DoctorBHTStatus[]).filter((b) => b.status === 'draft').length,
+          finalizedBHTs: (bhts as DoctorBHTStatus[]).filter((b) => b.status === 'finalized').length,
         });
       } catch (error) {
         console.error('Failed to fetch stats:', error);
@@ -82,7 +88,7 @@ function DoctorDashboard() {
           </p>
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
             <p className="text-sm text-blue-800 dark:text-blue-400">
-              <strong>What's next?</strong><br />
+              <strong>What&apos;s next?</strong><br />
               A consultant will review your registration and ward assignment. This usually takes 1-2 business days.
             </p>
           </div>
@@ -357,4 +363,20 @@ function DoctorDashboard() {
   );
 }
 
-export default DoctorDashboard;
+export default function DoctorDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 via-white to-red-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-red-600 border-r-transparent border-b-transparent border-l-transparent absolute inset-0"></div>
+          </div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading dashboard...</p>
+        </div>
+      }
+    >
+      <DoctorDashboardContent />
+    </Suspense>
+  );
+}

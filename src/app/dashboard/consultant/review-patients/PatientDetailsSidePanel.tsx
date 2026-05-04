@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+type Vitals = Record<string, string | number | null | undefined>;
+
 interface PatientDetails {
   patient: {
     patient_id: string;
@@ -33,7 +35,7 @@ interface PatientDetails {
     treatment_plan: string;
     medications: string;
     status: string;
-    vitals?: any;
+    vitals?: Vitals;
     upload_date: string;
   }>;
   summary: {

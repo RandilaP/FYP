@@ -4,7 +4,8 @@ import type { NextRequest } from 'next/server';
 // Since we're using localStorage for tokens (client-side),
 // we rely on client-side guards in each protected page.
 // Middleware can't access localStorage, so we keep this minimal.
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
+  void request;
   return NextResponse.next();
 }
 

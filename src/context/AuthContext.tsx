@@ -44,7 +44,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const pathname = usePathname();
 
   const TOKEN_KEY = 'access_token';
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
   // Fetch user info using the token
   const fetchUserInfo = async () => {
@@ -170,7 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const dashboardRoute = getDashboardRoute(user.role);
       router.push(dashboardRoute);
     }
-  }, [user, isLoading, pathname]);
+  }, [user, isLoading, pathname, router]);
 
   const value: AuthContextType = {
     user,

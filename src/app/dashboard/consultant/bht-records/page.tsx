@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -33,7 +33,7 @@ export default function BHTRecordsPage() {
     }
   }, [user, isLoading, router]);
 
-  const fetchBHTRecords = async () => {
+  const fetchBHTRecords = useCallback(async () => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
@@ -64,13 +64,13 @@ export default function BHTRecordsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterPatient, filterStatus, filterWard]);
 
   useEffect(() => {
     if (user) {
       fetchBHTRecords();
     }
-  }, [user, filterWard, filterPatient, filterStatus]);
+  }, [user, fetchBHTRecords]);
 
   const clearFilters = () => {
     setFilterWard('');

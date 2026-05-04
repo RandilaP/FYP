@@ -57,7 +57,7 @@ export async function getPatientDetails(patientId: string) {
   return response.json();
 }
 
-export async function updatePatient(patientId: string, data: any) {
+export async function updatePatient(patientId: string, data: Record<string, unknown>) {
   const token = localStorage.getItem('access_token');
   const response = await fetch(`${API_BASE}/api/patients/${patientId}`, {
     method: 'PUT',
@@ -137,7 +137,7 @@ export async function getPatientBHTRecords(patientId: string, status?: string) {
   return response.json();
 }
 
-export async function updateBHTRecord(recordId: string, data: any) {
+export async function updateBHTRecord(recordId: string, data: Record<string, unknown>) {
   const token = localStorage.getItem('access_token');
   const response = await fetch(`${API_BASE}/api/bht_records/${recordId}`, {
     method: 'PUT',

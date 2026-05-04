@@ -5,6 +5,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import PatientDetailsSidePanel from './PatientDetailsSidePanel';
 
+type Vitals = Record<string, string | number | null | undefined>;
+
+const getErrorMessage = (err: unknown, fallback: string) =>
+  err instanceof Error ? err.message : fallback;
+
 interface SubmittedPatient {
   patient_id: string;
   patient_name: string;
@@ -62,7 +67,7 @@ interface PatientDetails {
     symptoms: string;
     treatment_plan: string;
     medications: string;
-    vitals: any;
+    vitals: Vitals;
     status: string;
     upload_date: string;
   }>;
@@ -120,8 +125,8 @@ function ReviewPatientsPage() {
 
       const data = await response.json();
       setPatients(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load patients');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to load patients'));
     } finally {
       setLoading(false);
     }
@@ -150,8 +155,8 @@ function ReviewPatientsPage() {
 
       const data = await response.json();
       setSelectedPatient(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load patient details');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to load patient details'));
     } finally {
       setDetailsLoading(false);
     }
@@ -192,8 +197,8 @@ function ReviewPatientsPage() {
       loadSubmittedPatients();
 
       setTimeout(() => setSuccessMessage(''), 5000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to approve patient');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to approve patient'));
     }
   };
 
@@ -237,29 +242,9 @@ function ReviewPatientsPage() {
       loadSubmittedPatients();
 
       setTimeout(() => setSuccessMessage(''), 5000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to reject patient');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to reject patient'));
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   };
 
   if (isLoading || loading) {

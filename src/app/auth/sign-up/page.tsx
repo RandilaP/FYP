@@ -56,6 +56,14 @@ interface Ward {
   consultant_id: string;
 }
 
+interface SignUpPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  ward_id?: string;
+}
+
 export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -116,7 +124,7 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      const payload: any = {
+      const payload: SignUpPayload = {
         name,
         email,
         password,
