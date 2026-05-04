@@ -8,7 +8,14 @@ export async function POST(request: NextRequest) {
     console.log('Role being sent:', body.role);
     
     // Forward request to backend
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!backendUrl) {
+      return NextResponse.json(
+        { detail: 'NEXT_PUBLIC_API_URL is not configured in this deployment.' },
+        { status: 500 }
+      );
+    }
+
     const response = await fetch(`${backendUrl}/api/auth/signup`, {
       method: 'POST',
       headers: {
@@ -29,7 +36,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Signup error:', error);
     return NextResponse.json(
-      { detail: 'Internal server error' },
+      { detail: 'Internal server error while forwarding signup request' },
       { status: 500 }
     );
   }
