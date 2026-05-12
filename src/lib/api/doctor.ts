@@ -1,6 +1,7 @@
 // API functions for doctor dashboard operations
+import { getApiBaseUrl } from './base';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = getApiBaseUrl();
 
 // Patient Management
 export async function getMyPatients() {

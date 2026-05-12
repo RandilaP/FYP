@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { getApiBaseUrl } from '@/lib/api/base';
 
 interface DashboardStats {
   total_pending_doctors: number;
@@ -44,7 +45,7 @@ function ConsultantDashboard() {
       if (!token) return;
 
       try {
-        const response = await fetch('http://localhost:8000/api/consultants/dashboard', {
+        const response = await fetch(`${getApiBaseUrl()}/api/consultants/dashboard`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

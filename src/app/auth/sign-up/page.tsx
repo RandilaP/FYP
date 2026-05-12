@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import NavBar from '@/app/components/NavBar';
 import { useRouter } from "next/navigation";
+import { getApiBaseUrl } from '@/lib/api/base';
 
 const UserAddIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -82,7 +83,7 @@ export default function SignUp() {
     const fetchWards = async () => {
       setLoadingWards(true);
       try {
-        const response = await fetch('http://localhost:8000/api/wards/');
+        const response = await fetch(`${getApiBaseUrl()}/api/wards/`);
         if (response.ok) {
           const data = await response.json();
           setWards(data);

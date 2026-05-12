@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { getApiBaseUrl } from '@/lib/api/base';
 import PatientDetailsSidePanel from '../review-patients/PatientDetailsSidePanel';
 
 type Vitals = Record<string, string | number | null | undefined>;
@@ -102,7 +103,7 @@ export default function WardManagementPage() {
     if (!token || !user) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/consultants/${user.user_id}/wards`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/consultants/${user.user_id}/wards`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -127,7 +128,7 @@ export default function WardManagementPage() {
 
     setLoadingDetails(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/wards/${wardId}/patients`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/wards/${wardId}/patients`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -154,7 +155,7 @@ export default function WardManagementPage() {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:8000/api/consultants/patients/${patientId}/details`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/consultants/patients/${patientId}/details`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -201,7 +202,7 @@ export default function WardManagementPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/wards/', {
+      const response = await fetch(`${getApiBaseUrl()}/api/wards/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

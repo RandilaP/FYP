@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { getApiBaseUrl } from '@/lib/api/base';
 
 interface BHTRecord {
   bht_id: string;
@@ -45,7 +46,7 @@ export default function BHTRecordsPage() {
       if (filterPatient) params.append('patient_id', filterPatient);
       if (filterStatus) params.append('status', filterStatus);
 
-      const url = `http://localhost:8000/api/bht_records/${params.toString() ? '?' + params.toString() : ''}`;
+      const url = `${getApiBaseUrl()}/api/bht_records/${params.toString() ? '?' + params.toString() : ''}`;
       
       const response = await fetch(url, {
         headers: {

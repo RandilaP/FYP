@@ -1,5 +1,7 @@
 // API utility functions for Consultant dashboard
-const API_BASE_URL = 'http://localhost:8000';
+import { getApiBaseUrl } from './base';
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Helper function to get auth token
 const getAuthToken = (): string | null => {

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { getApiBaseUrl } from '@/lib/api/base';
 import PatientDetailsSidePanel from './PatientDetailsSidePanel';
 
 type Vitals = Record<string, string | number | null | undefined>;
@@ -113,7 +114,7 @@ function ReviewPatientsPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/consultants/submitted-patients', {
+      const response = await fetch(`${getApiBaseUrl()}/api/consultants/submitted-patients`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -140,7 +141,7 @@ function ReviewPatientsPage() {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:8000/api/consultants/patients/${patientId}/details`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/consultants/patients/${patientId}/details`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -171,7 +172,7 @@ function ReviewPatientsPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/consultants/patients/${selectedPatient.patient.patient_id}/review`,
+        `${getApiBaseUrl()}/api/consultants/patients/${selectedPatient.patient.patient_id}/review`,
         {
           method: 'POST',
           headers: {
@@ -213,7 +214,7 @@ function ReviewPatientsPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/consultants/patients/${selectedPatient.patient.patient_id}/review`,
+        `${getApiBaseUrl()}/api/consultants/patients/${selectedPatient.patient.patient_id}/review`,
         {
           method: 'POST',
           headers: {

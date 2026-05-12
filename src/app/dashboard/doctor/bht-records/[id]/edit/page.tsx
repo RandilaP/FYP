@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { updateBHTRecord } from '@/lib/api/doctor';
+import { getApiBaseUrl } from '@/lib/api/base';
 
 interface BHTRecord {
   bht_id: string;
@@ -53,7 +54,7 @@ export default function BHTEditPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://localhost:8000/api/bht_records/${recordId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/bht_records/${recordId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

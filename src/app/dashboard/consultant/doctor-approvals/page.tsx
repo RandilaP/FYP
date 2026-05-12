@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { getApiBaseUrl } from '@/lib/api/base';
 
 interface PendingDoctor {
   user_id: string;
@@ -46,7 +47,7 @@ export default function DoctorApprovalsPage() {
 
     try {
       // Fetch wards first
-      const wardsResponse = await fetch('http://localhost:8000/api/wards/', {
+      const wardsResponse = await fetch(`${getApiBaseUrl()}/api/wards/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -57,7 +58,7 @@ export default function DoctorApprovalsPage() {
       }
 
       // Fetch pending and rejected doctors
-      const response = await fetch('http://localhost:8000/api/users/pending-registrations', {
+      const response = await fetch(`${getApiBaseUrl()}/api/users/pending-registrations`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -97,7 +98,7 @@ export default function DoctorApprovalsPage() {
 
     setProcessingId(userId);
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/approve`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/users/${userId}/approve`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -137,7 +138,7 @@ export default function DoctorApprovalsPage() {
 
     setProcessingId(rejectUserId);
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${rejectUserId}/reject`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/users/${rejectUserId}/reject`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
