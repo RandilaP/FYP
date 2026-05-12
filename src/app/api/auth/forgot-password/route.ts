@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-    // Forward request to your backend
+
     const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
     if (!backendUrl) {
       return NextResponse.json(
@@ -13,41 +12,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${backendUrl}/api/auth/login`, {
+    const response = await fetch(`${backendUrl}/api/auth/change-password`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
 
     const responseText = await response.text();
     let data: unknown = responseText;
-
     try {
       data = responseText ? JSON.parse(responseText) : null;
     } catch {
-      // Keep the raw text body if the upstream did not return JSON.
+      // keep raw text
     }
 
     if (!response.ok) {
-      // Prefer a clear upstream error message if present
       const upstreamDetail = (data && (data as any).detail) || (data && (data as any).message) || data || response.statusText;
-      return NextResponse.json(
-        { detail: upstreamDetail },
-        { status: response.status }
-      );
+      return NextResponse.json({ detail: upstreamDetail }, { status: response.status });
     }
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error('Error in auth login proxy:', error);
-    return NextResponse.json(
-      {
-        detail: 'Internal server error while forwarding login request',
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
-    );
+    console.error('Error in forgot-password proxy:', error);
+    return NextResponse.json({ detail: 'Internal server error while forwarding request', error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
+
+export const runtime = 'edge';
