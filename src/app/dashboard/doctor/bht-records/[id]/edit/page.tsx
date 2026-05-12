@@ -98,7 +98,7 @@ export default function BHTEditPage() {
             })()
           : formData.lab_results;
 
-      await updateBHTRecord(recordId, {
+      const updatedRecord = await updateBHTRecord(recordId, {
         diagnosis: formData.diagnosis,
         symptoms: formData.symptoms,
         treatment_plan: formData.treatment_plan,
@@ -116,7 +116,12 @@ export default function BHTEditPage() {
           notes: formData.notes,
         }),
       });
-      setSuccess('BHT record updated successfully!');
+      setFormData((prev) => ({ ...prev, ...updatedRecord }));
+      setSuccess(
+        updatedRecord.status === 'draft'
+          ? 'BHT record updated and moved back to draft.'
+          : 'BHT record updated successfully!'
+      );
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update BHT record');

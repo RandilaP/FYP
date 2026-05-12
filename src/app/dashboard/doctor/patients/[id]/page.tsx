@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import NotificationToast from '@/app/components/NotificationToast';
+import ConfirmDialog from '@/app/components/ConfirmDialog';
 import {
   getPatientDetails,
   getPatientBHTRecords,
@@ -71,6 +73,12 @@ export default function PatientDetailPage() {
   const [generatingSummary, setGeneratingSummary] = useState(false);
   const [savingSummary, setSavingSummary] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [notification, setNotification] = useState<{
+    variant: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  } | null>(null);
 
   const fetchPatientData = useCallback(async () => {
     try {
@@ -159,7 +167,11 @@ export default function PatientDetailPage() {
 
   const handleSaveSummary = async () => {
     if (!patient || !summaryText.trim()) {
-      alert('Summary text cannot be empty');
+      setNotification({
+        variant: 'warning',
+        title: 'Nothing to save',
+        message: 'Summary text cannot be empty.',
+      });
       return;
     }
 
@@ -168,9 +180,17 @@ export default function PatientDetailPage() {
       const updatedSummary = await updatePatientSummary(patient.patient_id, summaryText);
       setSummaryData(updatedSummary);
       setEditingSummary(false);
-      alert('Summary saved successfully!');
+      setNotification({
+        variant: 'success',
+        title: 'Summary saved',
+        message: 'Patient summary was updated successfully.',
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to save summary');
+      setNotification({
+        variant: 'error',
+        title: 'Save failed',
+        message: err instanceof Error ? err.message : 'Failed to save summary',
+      });
     } finally {
       setSavingSummary(false);
     }
@@ -178,28 +198,45 @@ export default function PatientDetailPage() {
 
   const handleSubmitForReview = async () => {
     if (!summaryData) {
-      alert('Please generate a summary before submitting for review');
+      setNotification({
+        variant: 'warning',
+        title: 'Summary required',
+        message: 'Please generate a summary before submitting for review.',
+      });
       return;
     }
     
     if (summaryData.status !== 'draft') {
-      alert('Summary has already been submitted');
+      setNotification({
+        variant: 'warning',
+        title: 'Already submitted',
+        message: 'This summary has already been submitted.',
+      });
       return;
     }
 
-    if (!confirm('Are you sure you want to submit this patient for consultant review? All draft BHTs will be finalized.')) {
-      return;
-    }
+    setShowSubmitConfirm(true);
+  };
 
+  const confirmSubmitForReview = async () => {
+    setShowSubmitConfirm(false);
     setSubmitting(true);
     setError('');
 
     try {
       await submitPatientForReview(patientId);
-      alert('Patient successfully submitted for review!');
+      setNotification({
+        variant: 'success',
+        title: 'Submitted',
+        message: 'Patient successfully submitted for consultant review.',
+      });
       await fetchPatientData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit for review');
+      setNotification({
+        variant: 'error',
+        title: 'Submission failed',
+        message: err instanceof Error ? err.message : 'Failed to submit for review',
+      });
     } finally {
       setSubmitting(false);
     }
@@ -247,6 +284,14 @@ export default function PatientDetailPage() {
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
+        <NotificationToast
+          open={!!notification}
+          variant={notification?.variant}
+          title={notification?.title || ''}
+          message={notification?.message || ''}
+          onClose={() => setNotification(null)}
+        />
+
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link
@@ -576,6 +621,18 @@ export default function PatientDetailPage() {
             </div>
           </div>
         )}
+
+        <ConfirmDialog
+          open={showSubmitConfirm}
+          title="Submit for review?"
+          description="This will finalize the draft BHTs and send the patient summary to the consultant review queue."
+          confirmLabel={submitting ? 'Submitting...' : 'Submit'}
+          cancelLabel="Cancel"
+          onConfirm={confirmSubmitForReview}
+          onCancel={() => setShowSubmitConfirm(false)}
+          tone="primary"
+          confirmDisabled={submitting}
+        />
       </div>
     </div>
   );

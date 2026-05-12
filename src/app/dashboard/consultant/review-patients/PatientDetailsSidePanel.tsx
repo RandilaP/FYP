@@ -4,6 +4,37 @@ import React from 'react';
 
 type Vitals = Record<string, string | number | null | undefined>;
 
+const hasValue = (value: string | number | null | undefined) => {
+  if (value === null || value === undefined) {
+    return false;
+  }
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
+  }
+  return true;
+};
+
+const DetailField = ({
+  label,
+  value,
+  valueClassName = 'font-semibold text-gray-900 dark:text-white',
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  valueClassName?: string;
+}) => {
+  if (!hasValue(value)) {
+    return null;
+  }
+
+  return (
+    <div>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
+      <p className={valueClassName}>{value}</p>
+    </div>
+  );
+};
+
 interface PatientDetails {
   patient: {
     patient_id: string;
@@ -37,6 +68,8 @@ interface PatientDetails {
     status: string;
     vitals?: Vitals;
     upload_date: string;
+    doctor_name?: string | null;
+    doctor_email?: string | null;
   }>;
   summary: {
     report_id: string;
@@ -124,7 +157,7 @@ export default function PatientDetailsSidePanel({
         ) : patient ? (
           <>
             {/* Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-6 border-b border-blue-800">
+            <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 p-6 border-b border-blue-800">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-3xl font-bold text-white">{patient.patient.name}</h2>
@@ -156,64 +189,80 @@ export default function PatientDetailsSidePanel({
                     Patient Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Admission Date</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {formatDate(patient.patient.admission_date)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Ward</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">{patient.ward.name}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{patient.ward.location}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Attending Doctor</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">{patient.doctor?.name || 'N/A'}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{patient.doctor?.email || ''}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Emergency Contact</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {patient.patient.emergency_contact || 'N/A'}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Medical History</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {patient.patient.medical_history || 'None recorded'}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Allergies</p>
-                      <p className="font-semibold text-red-600 dark:text-red-400">
-                        {patient.patient.allergies || 'None recorded'}
-                      </p>
-                    </div>
+                    {hasValue(patient.patient.admission_date) && (
+                      <DetailField label="Admission Date" value={formatDate(patient.patient.admission_date)} />
+                    )}
+                    {hasValue(patient.ward?.name) && (
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Ward</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{patient.ward.name}</p>
+                        {hasValue(patient.ward.location) && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{patient.ward.location}</p>
+                        )}
+                      </div>
+                    )}
+                    {hasValue(patient.doctor?.name) && (
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Attending Doctor</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{patient.doctor.name}</p>
+                        {hasValue(patient.doctor.email) && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{patient.doctor.email}</p>
+                        )}
+                      </div>
+                    )}
+                    {hasValue(patient.patient.emergency_contact) && (
+                      <DetailField label="Emergency Contact" value={patient.patient.emergency_contact} />
+                    )}
+                    {hasValue(patient.patient.medical_history) && (
+                      <div className="col-span-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Medical History</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{patient.patient.medical_history}</p>
+                      </div>
+                    )}
+                    {hasValue(patient.patient.allergies) && (
+                      <div className="col-span-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Allergies</p>
+                        <p className="font-semibold text-red-600 dark:text-red-400">{patient.patient.allergies}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Patient Summary
-                  </h3>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-300 dark:border-blue-700">
-                    <p className="text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
-                      {patient.summary?.summary_text || 'No summary available'}
-                    </p>
+                {(hasValue(patient.summary?.summary_text) || hasValue(patient.summary?.status) || hasValue(patient.summary?.updated_at)) && (
+                  <div className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Patient Summary
+                    </h3>
+                    {hasValue(patient.summary?.summary_text) ? (
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-300 dark:border-blue-700">
+                        <p className="text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+                          {patient.summary.summary_text}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-300 dark:border-blue-700 text-sm text-gray-500 dark:text-gray-400">
+                        No summary available
+                      </div>
+                    )}
+                    {(hasValue(patient.summary?.status) || hasValue(patient.summary?.updated_at)) && (
+                      <div className="mt-3 flex items-center gap-2">
+                        {hasValue(patient.summary?.status) && (
+                          <span className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm font-semibold">
+                            {patient.summary.status}
+                          </span>
+                        )}
+                        {hasValue(patient.summary?.updated_at) && (
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            Updated: {formatDateTime(patient.summary.updated_at)}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    <span className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm font-semibold">
-                      {patient.summary?.status}
-                    </span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Updated: {formatDateTime(patient.summary?.updated_at)}
-                    </span>
-                  </div>
-                </div>
+                )}
 
                 {/* BHT Records */}
                 <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
@@ -223,8 +272,13 @@ export default function PatientDetailsSidePanel({
                     </svg>
                     BHT Records ({patient.bht_records.length})
                   </h3>
-                  <div className="space-y-4">
-                    {patient.bht_records.map((bht, index) => (
+                  {patient.bht_records.length === 0 ? (
+                    <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 text-sm text-gray-500 dark:text-gray-400">
+                      No BHT records available for this patient.
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {patient.bht_records.map((bht, index) => (
                       <div
                         key={bht.bht_id}
                         className="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
@@ -240,24 +294,40 @@ export default function PatientDetailsSidePanel({
                             </span>
                           </div>
                         </div>
+                        {hasValue(bht.doctor_name) && (
+                          <div className="mb-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 px-3 py-2 text-sm text-blue-800 dark:text-blue-200">
+                            Added by: <span className="font-semibold">{bht.doctor_name}</span>
+                            {hasValue(bht.doctor_email) && (
+                              <span className="text-blue-700/80 dark:text-blue-300/80"> · {bht.doctor_email}</span>
+                            )}
+                          </div>
+                        )}
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Diagnosis</p>
-                            <p className="font-semibold text-gray-900 dark:text-white">{bht.diagnosis}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Symptoms</p>
-                            <p className="font-semibold text-gray-900 dark:text-white">{bht.symptoms}</p>
-                          </div>
-                          <div className="col-span-2">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Treatment Plan</p>
-                            <p className="font-semibold text-gray-900 dark:text-white">{bht.treatment_plan}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Medications</p>
-                            <p className="font-semibold text-gray-900 dark:text-white">{bht.medications}</p>
-                          </div>
-                          {bht.vitals && (
+                          {hasValue(bht.diagnosis) && (
+                            <div>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Diagnosis</p>
+                              <p className="font-semibold text-gray-900 dark:text-white">{bht.diagnosis}</p>
+                            </div>
+                          )}
+                          {hasValue(bht.symptoms) && (
+                            <div>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Symptoms</p>
+                              <p className="font-semibold text-gray-900 dark:text-white">{bht.symptoms}</p>
+                            </div>
+                          )}
+                          {hasValue(bht.treatment_plan) && (
+                            <div className="col-span-2">
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Treatment Plan</p>
+                              <p className="font-semibold text-gray-900 dark:text-white">{bht.treatment_plan}</p>
+                            </div>
+                          )}
+                          {hasValue(bht.medications) && (
+                            <div>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Medications</p>
+                              <p className="font-semibold text-gray-900 dark:text-white">{bht.medications}</p>
+                            </div>
+                          )}
+                          {bht.vitals && Object.keys(bht.vitals).length > 0 && (
                             <div>
                               <p className="text-sm text-gray-600 dark:text-gray-400">Vitals</p>
                               <p className="font-semibold text-gray-900 dark:text-white">
@@ -268,7 +338,8 @@ export default function PatientDetailsSidePanel({
                         </div>
                       </div>
                     ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Statistics */}
@@ -325,7 +396,7 @@ export default function PatientDetailsSidePanel({
                 <button
                   onClick={onApprove}
                   disabled={isLoading}
-                  className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-green-400 disabled:to-green-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-4 bg-linear-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-green-400 disabled:to-green-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
                 >
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -335,7 +406,7 @@ export default function PatientDetailsSidePanel({
                 <button
                   onClick={onReject}
                   disabled={isLoading}
-                  className="flex-1 px-6 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-red-400 disabled:to-red-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-4 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-red-400 disabled:to-red-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
                 >
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

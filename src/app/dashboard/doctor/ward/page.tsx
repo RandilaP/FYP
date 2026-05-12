@@ -41,7 +41,7 @@ export default function WardPage() {
         getWardPatients(user.ward_id),
         getWardBHTRecords(user.ward_id),
       ]);
-      setPatients(patientsData);
+      setPatients((patientsData as Patient[]).filter((patient: Patient) => !patient.discharge_date));
       setBhts(bhtsData);
       setError('');
     } catch (err) {
@@ -112,7 +112,7 @@ export default function WardPage() {
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Patients</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                  {patients.filter(p => !p.discharge_date).length}
+                  {patients.length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
@@ -192,11 +192,9 @@ export default function WardPage() {
                         {patient.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </span>
                     </div>
-                    {!patient.discharge_date && (
-                      <span className="px-2 py-1 text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full">
-                        Active
-                      </span>
-                    )}
+                    <span className="px-2 py-1 text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full">
+                      Active
+                    </span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     {patient.name}

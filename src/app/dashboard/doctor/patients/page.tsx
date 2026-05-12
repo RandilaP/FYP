@@ -49,7 +49,7 @@ export default function PatientsPage() {
         getWardPatients(user.ward_id),
         getWardBHTRecords(user.ward_id),
       ]);
-      setPatients(patientsData);
+      setPatients((patientsData as Patient[]).filter((patient: Patient) => !patient.discharge_date));
       setBhts(bhtsData);
       setError('');
     } catch (err) {
@@ -96,7 +96,7 @@ export default function PatientsPage() {
     }
   };
 
-  const activePatients = patients.filter(p => !p.discharge_date).length;
+  const activePatients = patients.length;
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchQuery.toLowerCase())

@@ -39,9 +39,10 @@ function DoctorDashboardContent() {
           getMyPatients(),
           getMyBHTRecords(),
         ]);
+        const activePatients = patients.filter((patient: any) => !patient.discharge_date);
         
         setStats({
-          totalPatients: patients.length,
+          totalPatients: activePatients.length,
           draftBHTs: (bhts as DoctorBHTStatus[]).filter((b) => b.status === 'draft').length,
           finalizedBHTs: (bhts as DoctorBHTStatus[]).filter((b) => b.status === 'finalized').length,
         });

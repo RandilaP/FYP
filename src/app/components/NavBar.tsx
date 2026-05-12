@@ -46,9 +46,9 @@ export default function NavBar() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header className="w-full">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mt-4 flex items-center justify-between py-3 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-2xl px-6 shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
+        <div className="my-4 flex items-center justify-between py-3 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-2xl px-6 shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 via-red-600 to-blue-600 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-all group-hover:scale-105">
               <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
